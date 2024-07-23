@@ -16,7 +16,7 @@ timezone: America/Detroit
 
 title: Joseph Pickard
 
-tagline: I'm trying my best # it will display as the sub-title
+tagline: Hi # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   Documenting my projects. Science, art, etc.
