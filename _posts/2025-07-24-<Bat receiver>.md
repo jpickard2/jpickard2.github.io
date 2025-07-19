@@ -13,7 +13,7 @@ It is common knowledge that bats are not birds, nor bugs (Calvin!), but a third 
 
 ## Bat "detectors"
 
-This is another project idea I came across with quite a few examples scattered around the internet. I guess it's thematically related to the cloud chamber and my hobby of macro photography in that it's revealing something that's normally hidden. Devices to convert ultrasonic sound to the audible range are most commonly called ["bat detectors"](https://magenta2000.co.uk/product/bat4-bat-detector/). I don't like that name too much. A better name I've seen is "bat listener" as seen on this unsecure site github won't let me link to: integraonline.com/~wolfden/bat-listener-iv-sch.jpg. ![Bat listener](/myfiles/bat-listener-iv-sch.jpg)
+This is another project idea I came across with quite a few examples scattered around the internet. I guess it's thematically related to the cloud chamber and my hobby of macro photography in that it's revealing something that's normally hidden. Devices to convert ultrasonic sound to the audible range are most commonly called ["bat detectors"](https://magenta2000.co.uk/product/bat4-bat-detector/). I don't like that name too much. A better name I've seen is "bat listener" as seen on this site github won't let me link to: integraonline.com/~wolfden/bat-listener-iv-sch.jpg. ![Bat listener](/myfiles/bat-listener-iv-sch.jpg){: w="400"}
 I decided to call mine a "bat receiver" -- I think that captures the purpose better, and the circuitry is related to radio receivers, as we'll discuss. [Similar devices](https://www.arrl.org/files/file/Technology/PLN/Ultrasonic_Pinpointer.pdf) can be used to find power line arcs, as those also put out ultrasonic frequencies. There are some nice versions you can buy, from simple analog ones up to fancier digital devices or plug-ins for your phone that can record and display the sounds. My goal was to design it myself as a way of learning about electronics, especially audio stuff (I've also been building analog synthesizer modules -- more on that soon hopefully). Anyway, rather than buying one or just copying someone's design, I wanted to understand the theory and design it from the ground up myself, even if I wasn't really inventing anything groundbreaking.
 
 ## General concept
@@ -23,6 +23,7 @@ The goal is to convert a higher frequency sound into a lower frequency sound. It
 ## Heterodyne receiver
 
 Heterodyning refers to combining two *different* frequencies in order to get new ones. According to the helpful [Wikipedia article](https://en.wikipedia.org/wiki/Heterodyne), this concept was first used for early radio receivers to convert high frequncy Morse code signals directly into lower frequency audible sounds. As the article describes, two sine waves can be mathematically multiplied to produce their sum and difference frequencies. 
+
 ![Equation for multiplying two waves, from Wikipedia](https://wikimedia.org/api/rest_v1/media/math/render/svg/aada5e40d0c8b6590187f84bdad6f410c8caa103)
 
 This is called mixing (not to be confused with audio mixing, which is more accurately called summing, and does not produce any new frequencies). So if we mix (*multiply!*) a high frequency radio signal at, say, [88.3 MHz](https://www.wcbn.org) with another local signal at 88.2 MHz, we will get out new frequencies at 0.1 MHz (100 kHz) and 176.5 MHz. For radio, there will be some further steps to demodulate (?) that signal to get out the original audio. We just want to bring down the ultrasonic sound into the audible range and listen to it directly. The heterodyne concept is still used in radios, because by adjusting the local signal, every station (frequency) can be conveniently converted to the *same* intermediate frequency for the radio to work on. That's useful because you can tune your filters and amplifiers to be perfect at that single intermediate frequency, instead of having to adjust them as you move the dial around. All that needs to be adjusted is the local oscillator and some front-end filtering/amplifying.
@@ -41,7 +42,7 @@ There are many types of oscillating circuits we could use. I was originally goin
 
 Naturally, most microphones are optimized for the audio range, and have significant drop off above 10-20 kHz, so that's no good for our purpose. To my disappointment, a lot of the bat detector designs on the internet seem to get sloppy when it comes to the microphone, which seems like a big mistake. Everything depends on the quality of the signal coming in! Many people repurpose ultrasonic transducers as the microphones, which can't possibly be ideal. I looked around for true ultrasonic mics and found one that is no longer produced but still available from [some](https://www.win-source.net/products/detail/knowles/spu0410lr5h-qb.html) electronics resellers. Since it is a small surface mount package, there is even a [company in the UK](https://micbooster.com/product/ultrasonic-mic-board/?v=7885444af42e) that sells it on small breakout boards to make it easier to work with. They put a little picture of a bat on it too, hmmm... I bought one of those to test and then designed my own board, and grabbed a reel of them for about $0.50 each just in case. This was my first foray into surface mount reflow soldering with a stencil and solder paste. It went surprisingly well, even using a simple hot plate at work.
 So, this microphone should give us the best possible signal coming in, with good response up to at least 80 kHz (that's as high as their spec sheet shows).
-![Picture of ultrasonic mic on breakout board](/myfiles/IMG_2065.JPG)
+![Picture of ultrasonic mic on breakout board](/myfiles/IMG_2065.JPG){: w="400"}
 
 ## Rest of the circuit
 
@@ -50,20 +51,24 @@ Now we have our quality signal coming in, mixing with a local oscillator, and th
 ## PCB design
 
 I also used this project as a reason to learn KiCad. That was actually a lot of fun. I did a pretty relaxed layout, keeping things positioned according to their function and place in the signal chain. All through-hole components. 2 layers, with the top as power plane and bottom as ground plane. No discrete vias added, just used the many plated through-holes for that purpose. I tried prototypes from 3 different manufacturers (JLCPCB, PCBWay and Oshpark). All seemed fine.
-![PCB layout](/myfiles/PCB_layout.png)
+![PCB layout](/myfiles/PCB_layout.png){: w="400"}
+
 
 ## Enclosure design
 
 There was no reason to make the electronics super small with surface mount parts, since I wanted it to have a comfortable hand-held size and shape anyway. I placed the microphone out front on its own small board. Interestingly the mic port is on the bottom side of the chip, so the board needs a non-plated (no solder wicking in!) through-hole to let sound through. I followed the manufacturer's recommendations for sizing that and found a footprint file already made for KiCad, which worked beautifully for the intricate solder mask. I used 0.8mm thickness for the mic board. I designed the case in Shapr3D on my iPad. A nice feature in KiCad is the ability to export a model of your populated PCB. That way I could design the case to fit around it perfectly. The mic board slides down into a slot to get it as close to the outside as possible. I designed the board to connect via simple soldered wires to the two pots, power switch, mic board and battery, so that these could be moved around freely if I wanted to adjust their positions. Making removable lids for cases is an ongoing adventure. For my synth module enclosures I've been using magnets, which work great but they're a bit excessive. This time I used a lid that slides along grooves. Then some small bumps keep it locked in place. Seems to work!
-![Case with back open](/myfiles/IMG_2222.JPG)
-![Case held in hand](/myfiles/IMG_2227.JPG)
+![Internals](/myfiles/IMG_2286.JPG){: w="400"}
+![Populated PCB](/myfiles/IMG_2287.JPG){: w="400"}
+![Case with back open](/myfiles/IMG_2222.JPG){: w="400"}
+![Case held in hand](/myfiles/IMG_2227.JPG){: w="400"}
 
 
 ## Results
 
 It draws about 15-17 mA at 9V on the bench supply. Thus, a typical 9V battery should last 29 hours. Incidentally, 9V batteries have pretty poor capacity compared to AAs and AAAs. I only went with 9V because of the convenient form factor. The power indicator LED adds about 1mA and it's very bright at night.
 First, the high pass filtering and mic sensitivity do an excellent job attenuating normal audio range sounds. However, rubbing fingers together, scratching your skin, sniffing or exhaling through the nose, and walking through grass produce unexpectedly loud noise. Jangling keys make a noticably different and loud sound -- like porcelain wind chimes or something. This is the best test sound for checking function.
-Finally it was time to take it outside. I sat on the grass at dusk where I had seen bats before, and listened, tuning the LO up and down. There was some background, not coincidentally like the sound of tuning a vintage radio. I guess this is produced by the LO interacting with noise and producing all kinds of product frequencies. By the way, multiplication is not perfect -- there are inevitably additional harmonics of the sum and difference frequencies produced. I don't know how to avoid it and it's not too annoying. But then, I heard some much louder clicks and pops. Bats, fluttering overhead as darkness fell. It was very satisfying to hear them after all that planning. Listen to some recordings I made [here](https://youtu.be/ReN3e7uDQn8)
+Finally it was time to take it outside. I sat on the grass at dusk where I had seen bats before, and listened, tuning the LO up and down. There was some background, not coincidentally like the sound of tuning a vintage radio. I guess this is produced by the LO interacting with noise and producing all kinds of product frequencies. By the way, multiplication is not perfect -- there are inevitably additional harmonics of the sum and difference frequencies produced. I don't know how to avoid it and it's not too annoying. But then, I heard some much louder clicks and pops. Bats, fluttering overhead as darkness fell. It was very satisfying to hear them after all that planning. 
+Listen to some recordings I made [here](https://youtu.be/ReN3e7uDQn8).
 The mic is *not* as directional as I feared, which was a pleasant surprise. You can hold it in front of you and any bats in the vicinity will be heard before they're seen.
 I walked around and listened for anything else that might make interesting sounds. Bugs flying near the mic could be heard buzzing, although it's not much different than what you'd expect a bug to sound like. Again, the attenuation of regular noise was excellent -- I was next to a road but passing cars produced no sound in my headphones. I noticed a loud hiss from one motorcycle though. Fourth of July fireworks nearby were also not heard. Jangling keys in a passerby's pocket stood out clearly. A fountain produced pleasant white noise in the ultrasonic region too -- true white noise is supposed to be equally loud at frequencies from 0 to infinity, I think (we'll save that for the analog synth posts). I did hear one interesting call in the distance which I will try to track down in the future -- maybe a frog?
 
@@ -78,30 +83,31 @@ What about the other end of the sound spectrum -- sounds that are below our rang
 
 ![Bat receiver v1.0 schematic](/myfiles/bat_receiver_v1.0_schematic.png)
 
-Designator	Footprint	Quantity	Designation	Notes
-batt/power1	SolderWire-0.5sqmm_1x04_P4.6mm_D0.9mm_OD2.1mm	1	batt/power switch	
-C1,C3	C_Disc_D3.0mm_W1.6mm_P2.50mm	2	1n	
-C12	CP_Radial_D5.0mm_P2.50mm	1	10u	Polarized electrolytic
-C2,C4,C5,C7,C8,C10,C11	C_Disc_D10.0mm_W2.5mm_P5.00mm	7	10n	
-C6	C_Disc_D3.0mm_W1.6mm_P2.50mm	1	470p	LO timing
-C9,C13	C_Disc_D10.0mm_W2.5mm_P5.00mm	2	100n	
-D1	LED_D5.0mm	1	Red 2V Vf, 1mA target	
-freq1	SolderWire-0.5sqmm_1x02_P4.6mm_D0.9mm_OD2.1mm	1	to 20k linear pot	
-mic1	SolderWire-0.5sqmm_1x03_P4.6mm_D0.9mm_OD2.1mm	1	to mic board	
-out1	SolderWire-0.5sqmm_1x03_P4.6mm_D0.9mm_OD2.1mm	1	to stereo jack	
-Q1,Q2	TO-92_Inline	2	2N3904	
-R1	R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal	1	47k	
-R10	R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal	1	3k6 (using 3k57 because I have)	
-R11	R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal	1	3k	
-R2,R13	R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal	2	10k	
-R3	R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal	1	4k7	
-R4	R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal	1	1k	
-R5,R6	R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal	2	22k	
-R7,R8	R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal	2	470	
-R9,R12	R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal	2	1k5	
-U1	DIP-16_W7.62mm_Socket	1	CD4051	
-U2	DIP-14_W7.62mm_Socket	1	CD4047	
-U3	DIP-8_W7.62mm_Socket	1	LM386	
-volume1	SolderWire-0.5sqmm_1x03_P4.6mm_D0.9mm_OD2.1mm	1	to 10k linear pot	
+|Designator|Footprint|Quantity|Designation|Notes|
+------------------------------------------------
+|batt/power1|SolderWire-0.5sqmm_1x04_P4.6mm_D0.9mm_OD2.1mm|1	batt/power switch|
+|C1,C3|C_Disc_D3.0mm_W1.6mm_P2.50mm|2|1n|
+|C12|CP_Radial_D5.0mm_P2.50mm|1|10u|Polarized electrolytic|
+|C2,C4,C5,C7,C8,C10,C11|C_Disc_D10.0mm_W2.5mm_P5.00mm|7|10n|
+|C6|C_Disc_D3.0mm_W1.6mm_P2.50mm|1|470p|LO timing|
+|C9,C13|C_Disc_D10.0mm_W2.5mm_P5.00mm|2|100n|
+|D1|LED_D5.0mm|1|Red 2V Vf, 1mA target|
+|freq1|SolderWire-0.5sqmm_1x02_P4.6mm_D0.9mm_OD2.1mm|1|to 20k linear pot|
+|mic1|SolderWire-0.5sqmm_1x03_P4.6mm_D0.9mm_OD2.1mm|1|to mic board|
+|out1|SolderWire-0.5sqmm_1x03_P4.6mm_D0.9mm_OD2.1mm|1|to stereo jack|
+|Q1,Q2|TO-92_Inline|2|2N3904|
+|R1|R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal|1|47k|
+|R10|R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal|1|3k6 (using 3k57 because I have)|
+|R11|R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal|1|3k|
+|R2,R13|R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal||10k|
+|R3|R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal|1|4k7|
+|R4|R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal||1k|
+|R5,R6|R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal|2|22k|
+|R7,R8|R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal|2|470|
+|R9,R12|R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal|2|1k5|
+|U1|DIP-16_W7.62mm_Socket|1|CD4051|
+|U2|DIP-14_W7.62mm_Socket|1|CD4047|
+|U3|DIP-8_W7.62mm_Socket|1|LM386|
+|volume1|SolderWire-0.5sqmm_1x03_P4.6mm_D0.9mm_OD2.1mm|1|to 10k linear pot|
 
 
