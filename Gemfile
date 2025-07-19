@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
+
+
 source "https://rubygems.org"
+
+gem 'csv'
+gem 'logger'
+gem 'base64'
 
 gem "jekyll-theme-chirpy", "~> 6.5", ">= 6.5.5"
 
