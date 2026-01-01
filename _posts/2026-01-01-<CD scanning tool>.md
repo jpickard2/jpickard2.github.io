@@ -103,14 +103,15 @@ While I can't really say how well it's predicting future sales value, we can loo
 
 **CD spine segmentation:**
 
+% of total boxes that are correctly identifying a spine: 64%
+
 ![All spine bounding boxes](/myfiles/CDs_processed_all_boxes.jpeg){: w="400"}
 
-% of total boxes that are correctly identifying a spine: 64%
+% correct after aspect ratio cleanup: 94%
 
 ![Only the correctly-sized boxes](/myfiles/CDs_processed_good_boxes.jpeg){: w="400"}
 
-% correct after aspect ratio cleanup: 94%
-% of actual spines identified by a box: 96%
+Final % of actual spines identified by a box: 96%
 
 **OCR:**
 Subjective, but of those spines that had "readable" text, 92% produced a decent OCR result
@@ -133,4 +134,6 @@ But, still a useful tool when trying to scan racks and racks of CDs
 - Deciding how to price discs based on what's for sale and other variables is an interesting side problem.
 
 
+Code here: [https://github.com/jpickard2/disctectiveV1](https://github.com/jpickard2/Disctective)
 
+I did get help from LLMs (I know...) for troubleshooting errors, learning how to use various tools, and creating some code. I did my best to actually understand everything that was being done, at least at a surface level.
