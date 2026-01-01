@@ -39,7 +39,7 @@ I was vaguely familiar with computer vision tools where, for instance, the compu
 
 <a title="(MTheiler), CC BY-SA 4.0 &lt;https://creativecommons.org/licenses/by-sa/4.0&gt;, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Detected-with-YOLO--Schreibtisch-mit-Objekten.jpg"><img width="512" alt="Detected-with-YOLO--Schreibtisch-mit-Objekten" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Detected-with-YOLO--Schreibtisch-mit-Objekten.jpg/512px-Detected-with-YOLO--Schreibtisch-mit-Objekten.jpg?20190114114019"></a>
 
-My needs were a little more strict, in that I wanted the box to not just surround the object, but tightly delimit the boundaries of the CD spine (segmentation). I thought this might be feasible using "primitive" computer vision processes -- edge detection and things -- kind of like (kind of literally the same as) adjusting different levels and applying filters in Photoshop until the edges of the CD cases "stick out", and then using those clear lines to crop the image. This worked OK (it should be a pretty simple task: all the objects are the same shape and size, contrasting colors, etc.) and yet it still wasn't performing well enough. Thus, I went to the next level: a full on neural network specialized for object detection, called YOLO ([here's](https://www.v7labs.com/blog/yolo-object-detectiona) a post with some background on that algorithm). This looked perfect, all I had to do was train it on my specific target objects. That meant drawing bounding boxes around hundreds and hundreds of CDs, but you gotta put in some work right? I initially used a web tool called Roboflow and then a Python program called X-AnyLabeling to draw the boxes and export them in YOLO format for training. 
+My needs were a little more strict, in that I wanted the box to not just surround the object, but tightly delimit the boundaries of the CD spine (segmentation). I thought this might be feasible using "primitive" computer vision processes -- edge detection and things -- kind of like (kind of literally the same as) adjusting different levels and applying filters in Photoshop until the edges of the CD cases "stick out", and then using those clear lines to crop the image. This worked OK (it should be a pretty simple task: all the objects are the same shape and size, contrasting colors, etc.) and yet it still wasn't performing well enough. Thus, I went to the next level: a full on neural network specialized for object detection, called YOLO ([here's](https://www.v7labs.com/blog/yolo-object-detection) a post with some background on that algorithm). This looked perfect, all I had to do was train it on my specific target objects. That meant drawing bounding boxes around hundreds and hundreds of CDs, but you gotta put in some work right? I initially used a web tool called Roboflow and then a Python program called X-AnyLabeling to draw the boxes and export them in YOLO format for training. 
 
 ![Annotating CDs with X-AnyLabeling](/myfiles/annotation.jpg){: w="700"}
 
@@ -49,9 +49,12 @@ Specifically I used the YOLOv8-OBB model (OBB is important, that's Oriented Boun
 
 Now that we have a nicely cropped single spine, we simply need to read the text: 
 ![A challenging spine to read](/myfiles/difficult_spine2.jpeg){: w="700"}
+
 Oh come on! Well, some are just going to be impossible, but some are easier: 
+
 ![A better spine to read](/myfiles/easy_spine.jpeg){: w="700"}
-Overall this is a harder problem than segmenting and it seems to be the weak point of the whole process. I tested a couple OCR options, from pre-processing the images myself and using the Pytesseract library, up to much more involved solutions for all-in-one whole document reading like Donut (https://www.philschmid.de/fine-tuning-donut). Eventually I settled on docTR (https://github.com/mindee/doctr), which has more features than we need but did the best job at reading difficult text. It outputs words grouped into lines, blocks, pages... and words have confidence scores assigned, so we can cut off at a certain quality level. I made a list of very common superfluous words to drop ("CD", "disc", "and", "digital", "etc", etc...) and also dropped most punctuation. I orient the spines horizontally but they may be upside down, so I check both ways and see which has the most good text and use that one. After struggling with this for a while I realized that although the artist/title/label are often in "creative" fonts, the catalog number is frequently much more clear (as in the example above). So if we prioritize that we should be better off. I put together some heuristics to decide if text is likely to be part of a catalog number, so if that looks good we can just use that for searching and disregard the rest. Doing that improved search accuracy a bit. Catalog numbers aren't always unique, but that's a risk we have to take.
+
+Overall this is a harder problem than segmenting and it seems to be the weak point of the whole process. I tested a couple OCR options, from pre-processing the images myself and using the Pytesseract library, up to much more involved solutions for all-in-one whole document reading like [Donut](https://www.philschmid.de/fine-tuning-donut). Eventually I settled on [docTR](https://github.com/mindee/doctr), which has more features than we need but did the best job at reading difficult text. It outputs words grouped into lines, blocks, pages... and words have confidence scores assigned, so we can cut off at a certain quality level. I made a list of very common superfluous words to drop ("CD", "disc", "and", "digital", "etc", etc...) and also dropped most punctuation. I orient the spines horizontally but they may be upside down, so I check both ways and see which has the most good text and use that one. After struggling with this for a while I realized that although the artist/title/label are often in "creative" fonts, the catalog number is frequently much more clear (as in the example above). So if we prioritize that we should be better off. I put together some heuristics to decide if text is likely to be part of a catalog number, so if that looks good we can just use that for searching and disregard the rest. Doing that improved search accuracy a bit. Catalog numbers aren't always unique, but that's a risk we have to take.
 
 ## Searching Discogs
 
@@ -98,19 +101,24 @@ Finally, we need to bring this all together in a way that can be used from the p
 
 While I can't really say how well it's predicting future sales value, we can look at one representative example of the whole process:
 
-CD spine segmentation:
+**CD spine segmentation:**
+
 ![All spine bounding boxes](/myfiles/CDs_processed_all_boxes.jpeg){: w="400"}
+
 % of total boxes that are correctly identifying a spine: 64%
+
 ![Only the correctly-sized boxes](/myfiles/CDs_processed_good_boxes.jpeg){: w="400"}
+
 % correct after aspect ratio cleanup: 94%
 % of actual spines identified by a box: 96%
 
-OCR:
+**OCR:**
 Subjective, but of those spines that had "readable" text, 92% produced a decent OCR result
 
-Search:
+**Search:**
 Of those that produced a "good" OCR product, 50% found the correct release
 
+**Final:**
 In the end, **41% (35/85)** of the CDs in the image were correctly identified
 
 Definitely leaves room for improvement, especially in developing heuristics to clean up the OCR results and improve the search. 
@@ -118,13 +126,11 @@ But, still a useful tool when trying to scan racks and racks of CDs
 
 
 
-
-
 ## Future plans and improvements
-	YOLO can be continually trained to get even better, hopefully. Another segmentation/identification model could be tried.
-	Investigating search details to potentially improve search success.
-	Scraping historical sales data and making a better value prediction model.
-	Deciding how to price discs based on what's for sale and other variables is an interesting side problem.
+- YOLO can be continually trained to get even better, hopefully. Another segmentation/identification model could be tried.
+- Investigating search details to potentially improve search success.
+- Scraping historical sales data and making a better value prediction model.
+- Deciding how to price discs based on what's for sale and other variables is an interesting side problem.
 
 
 
