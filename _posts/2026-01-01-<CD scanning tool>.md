@@ -19,7 +19,7 @@ Beautiful...
 
 Discogs also maintains a pretty decent app that includes a barcode scanner. So if you're flipping through a rack of discs, you can pick one up and within a few seconds get to the release page and all the info available on it, including the crucial sales info. This is OK, but if you're looking at racks of hundreds or thousands of discs, it's not going to be practical to pick up and scan each one. I wanted a way to speed up this process. In stores, CDs are typically arranged with their spines out (like books). The barcodes are on the back, so those won't be visible, but the spine usually has the record label, artist, title and catalog number. My idea was to take a picture with my phone and use optical character recognition (OCR) to quickly read as many spines as possible, search the Discogs database, and highlight the ones that had the best potential for resale.
 
-![CDs on shelves in a store](/myfiles/CDs_on_shelf.jpg){: w="500"}
+![CDs on shelves in a store](/myfiles/CDs_on_shelf.jpeg){: w="500"}
 
 
 ## Workflow
@@ -96,20 +96,25 @@ Finally, we need to bring this all together in a way that can be used from the p
 
 ## Overall quality
 
-While I can't really say how well it's predicting future sales value, we can look at some concrete metrics at each step of the process:
+While I can't really say how well it's predicting future sales value, we can look at one representative example of the whole process:
 
 CD spine segmentation:
 ![All spine bounding boxes](/myfiles/CDs_processed_all_boxes.jpeg){: w="400"}
-% of total boxes that are correct: 87/135
+% of total boxes that are correctly identifying a spine: 64%
 ![Only the correctly-sized boxes](/myfiles/CDs_processed_good_boxes.jpeg){: w="400"}
-% correct after aspect ratio cleanup: 87/93
-% of actual spines identified: 82/85
+% correct after aspect ratio cleanup: 94%
+% of actual spines identified by a box: 96%
 
 OCR:
-
+Subjective, but of those spines that had "readable" text, 92% produced a decent OCR result
 
 Search:
-% CDs correctly identified:
+Of those that produced a "good" OCR product, 50% found the correct release
+
+In the end, **41% (35/85)** of the CDs in the image were correctly identified
+
+Definitely leaves room for improvement, especially in developing heuristics to clean up the OCR results and improve the search. 
+But, still a useful tool when trying to scan racks and racks of CDs
 
 
 
